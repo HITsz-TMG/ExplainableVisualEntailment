@@ -1,5 +1,8 @@
 # Chunk-aware Alignment and Lexical Constraint for Visual Entailment with Natural Language Explanations
 
+## Updates
+Still on-going
+
 ## Introduction
 
 This repository contains source code necessary to reproduce the results presented in the paper [Chunk-aware Alignment and Lexical Constraint for Visual Entailment with Natural Language Explanations](https://arxiv.org/abs/2207.11401).
