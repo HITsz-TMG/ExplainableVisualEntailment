@@ -52,7 +52,7 @@ python run_SNLI_CALEC.py --do_train --do_lower_case --save_steps 1000 --enc_pret
 ```
 
 The checkpoints will be saved in the output_dir.
-You can run the code of ablation study ,e.g.,  `run_SNLI_CALEC_wo_LECG.py`, in a similar way. 
+You can run the code of ablation studies, e.g., `run_SNLI_CALEC_wo_LECG.py`, in a similar way. 
 
 The training procedure of VQA-X and VCR is similar to e-SNLI-VE.
 
