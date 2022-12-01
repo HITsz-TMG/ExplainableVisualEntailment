@@ -1,8 +1,5 @@
 # Chunk-aware Alignment and Lexical Constraint for Visual Entailment with Natural Language Explanations
 
-## Updates
-Still on-going
-
 ## Introduction
 
 This repository contains source code necessary to reproduce the results presented in the paper [Chunk-aware Alignment and Lexical Constraint for Visual Entailment with Natural Language Explanations](https://arxiv.org/abs/2207.11401).
@@ -11,69 +8,70 @@ We conduct extensive experiments on three datasets, and experimental results ind
 
 ![avatar](model.png)
 
-## Performance
-
-Follow [e-ViL](https://github.com/maximek3/e-ViL), we test our model on e-SNLI-VE, VQA-X and VCR. Please refer to the benchmark repository for the datasets detail.
-We only list $S_O$, $S_T$ and $S_E$ there, please refer to our [paper](https://arxiv.org/abs/2207.11401) for detailed results.
-
-**e-SNLI-VE**
-
-Model   | $S_O$    | $S_T$ | $S_E$   |
---------|-----|--------|-------|
-PJ-X    |  20.40 | 0.998  | 0.999 | 
-FME | 0.996 | 0.998  | 0.997 | 
-RVT  | 1.0 | 1.0    | 1.0   | 
-e-UG<sup>*</sup>   | 1.0 | 1.0    | 1.0   | 
-CALeC | 0.998 | 1.0    | 0.999 | 
-NLX-GPT<sup>†</sup>   | 0.996 | 1.0    | 0.998 | 
-CALeC<sup>†</sup> | 1.0 | 1.0    | 1.0   | 
-
 ## Training procedure
 
 We conduct experiments on three datasets: VQA-X, e-SNLI-VE and VCR. These datasets can be downloaded from [e-vil](https://github.com/maximek3/e-ViL).
-We extract the corresponding image features using [VilVL](https://github.com/pzzhang/VinVL) and pack them into *pkl* file.
-The *pkl* file contains: 
+Our model is based on [Oscar-base-image-captioning](https://github.com/microsoft/Oscar/blob/master/VinVL_DOWNLOAD.md) and [GPT-2-base](https://huggingface.co/gpt2), please download these models and change the ``model_name_or_path``, `seq_model_name_or_path` and `gpt_model_name_or_path` to your path.
 
+### Image feature extraction
+We extract the image features using [VilVL](https://github.com/pzzhang/VinVL) and save them into *pkl* file.
+The *pkl* file is organized as a dictionary:  `{image_id : {'image_feat': image_feat}}`
 
-
-Here is an example of get the borders of each chunk.
+### Get Chunk Border
+We utilize [Adapter](https://huggingface.co/AdapterHub/bert-base-uncased-pf-conll2000) to get the borders of each chunk of the input text.
+You may install adapter-transformers and run:
 
 ```
 python ./utils/GetChunk_v4_SNLI.py 
 ```
+The border index will be saved as a dictionary in *pkl* file.
 
-The border index will be saved as a dictionary in .pkl.
-
-##Training
+### CSI Pretraining
 Here is an example to pre-train CSI on Flickr30k:
 
 ```
 python CSI_prertain_align_only.py --do_train --do_lower_case --save_steps 1000 --output_dir ./outputs/CSI_pre_train
 ```
 
-Download [cococaption](https://github.com/tylin/coco-caption) for evaluation.
-Here is an example to train the model on e-SNLI-VE:
+### Training
+
+We train encoder and decoder separately, we give an example to train the model on e-SNLI-VE as follow:
+```
+python run_SNLI_CALEC_cls_only.py --do_train --do_lower_case --save_steps 1000 --output_dir ./outputs/SNLI_cls_only
 
 ```
-python run_SNLI_CALEC.py --do_train --do_lower_case --save_steps 1000 --output_dir ./outputs/SNLI
+
+You will need [cococaption](https://github.com/tylin/coco-caption) and the annotations in the correct format in order to perform evaluation on NLG metrics.
+Note that PTBTokenizer in [cococaption](https://github.com/tylin/coco-caption) will affect the NLG score.
+
+
+```
+python run_SNLI_CALEC.py --do_train --do_lower_case --save_steps 1000 --enc_pretrain_model_dir path_to_encoder --output_dir ./outputs/SNLI 
 ```
 
-The checkpoints will be saved in the output_dir
+The checkpoints will be saved in the output_dir.
+You can run the code of ablation study ,e.g.,  `run_SNLI_CALEC_wo_LECG.py`, in a similar way. 
+
+The training procedure of VQA-X and VCR is similar to e-SNLI-VE.
 
 ## Testing
 
-Here is an example to test a trained model on the e-SNLI-VE test set:
+Here is an example to run a trained model on the e-SNLI-VE test set using constrained beam sample:
 
 ```
-python run_SNLI_CALEC_CBS.py --do_test --do_lower_case --eval_model_dir your_save_checkpoint_path --constrained 0.86
+python run_SNLI_CALEC_CBS.py --do_test --do_lower_case --eval_model_dir path_to_ckpt --constrained 0.86
 ```
 
 The --constrained is the constrained coefficient used in constrained beam sample.
-All generated explanations and a text log will be saved in the given output directory (*your_save_checkpoint_path*).
+All generated explanations and a text log will be saved in the given output directory (*path_to_ckpt*).
 
-## COCOcaption package for automatic NLG metrics
+The testing procedure of VQA-X and VCR is similar to e-SNLI-VE.
 
-In order to run NLG evaluation in this code you need to download the package from this Google Drive link. It needs to be placed in the root directory of this project.
+## Results
+
+Follow [e-ViL](https://github.com/maximek3/e-ViL), we test our model CALeC on e-SNLI-VE, VQA-X and VCR. Please refer to the benchmark repository for the datasets detail.
+The output results (generated text) on the test dataset can be downloaded from the [Google Drive](https://drive.google.com/drive/folders/1WbSKPSft_f-YF0OJBcDB5c8yhwm889oR?usp=share_link).
+Please note that the results in the paper may not identically correspond to the results in the links above. We have trained several models and randomly picked one for presenting the qualitative results.
 
 
 ## Framework versions
