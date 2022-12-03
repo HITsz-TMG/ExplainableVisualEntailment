@@ -33,7 +33,7 @@ Here is an example to pre-train CSI on Flickr30k:
 python CSI_prertain_align_only.py --do_train --do_lower_case --save_steps 1000 --output_dir ./outputs/CSI_pre_train
 ```
 
-You canfind the pre-trained CSI on from the [Google Drive](https://drive.google.com/drive/folders/1b0dUHWwFvn7zCziAn9BriHdLwiJTeDS9?usp=sharing).
+You can find the pre-trained CSI on from the [Google Drive](https://drive.google.com/drive/folders/1b0dUHWwFvn7zCziAn9BriHdLwiJTeDS9?usp=sharing).
 
 ### Training
 
